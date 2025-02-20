@@ -1,0 +1,44 @@
+# =========================
+# 🌐 Global Ignore Rules
+# =========================
+# OS-generated files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Ignore workspace settings
+.idea/
+.vscode/
+*.iml
+
+# Ignore environment variables
+# **/src/main/resources/application.yml
+**/.env
+
+# =========================
+# Backend (Microservices)
+# =========================
+backend/**/target/       # Ignore target folders for all services
+backend/**/logs/         # Ignore logs for all services
+backend/**/.mvn/         # Ignore Maven wrapper directories
+backend/**/HELP.md       # Ignore auto-generated Spring Boot HELP.md files
+
+# Ignore specific services if needed (e.g., ignore build for order-service)
+# backend/order-service/target/
+# backend/payment-service/target/
+
+# =========================
+#  Frontend (React, Vue, Angular)
+# =========================
+frontend/node_modules/   # Ignore node_modules for all frontend projects
+frontend/dist/           # Ignore production build files
+frontend/build/
+
+# =========================
+# DevOps & CI/CD
+# =========================
+terraform/
+.github/
+.gitlab-ci.yml
+
