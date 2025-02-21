@@ -1,5 +1,6 @@
 package com.ecommerce.account_service.controller;
 
+import com.ecommerce.account_service.exception.ResourceNotFoundException;
 import com.ecommerce.account_service.payload.PaymentMethodDTO;
 import com.ecommerce.account_service.service.PaymentService;
 import jakarta.validation.Valid;
@@ -31,13 +32,19 @@ public class PaymentController {
     @GetMapping("/{id}")
     public ResponseEntity<PaymentMethodDTO> getPaymentMethodById(@PathVariable Long id) {
         PaymentMethodDTO paymentMethod = paymentService.getPaymentMethodById(id);
-        return paymentMethod != null ? ResponseEntity.ok(paymentMethod) : ResponseEntity.notFound().build();
+        if (paymentMethod == null) {
+            throw new ResourceNotFoundException("Payment method with ID: " + id + " not found.");
+        }
+        return ResponseEntity.ok(paymentMethod);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PaymentMethodDTO> updatePaymentMethod(@PathVariable Long id, @Valid @RequestBody PaymentMethodDTO paymentMethodDTO) {
         PaymentMethodDTO updatedPaymentMethod = paymentService.updatePaymentMethod(id, paymentMethodDTO);
-        return updatedPaymentMethod != null ? ResponseEntity.ok(updatedPaymentMethod) : ResponseEntity.notFound().build();
+        if (updatedPaymentMethod == null) {
+            throw new ResourceNotFoundException("Payment method with ID: " + id + " not found.");
+        }
+        return ResponseEntity.ok(updatedPaymentMethod);
     }
 
     @DeleteMapping("/{id}")
