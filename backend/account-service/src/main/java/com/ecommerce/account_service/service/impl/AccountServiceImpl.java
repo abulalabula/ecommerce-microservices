@@ -2,6 +2,8 @@ package com.ecommerce.account_service.service.impl;
 
 import com.ecommerce.account_service.dao.AccountRepository;
 import com.ecommerce.account_service.entity.Account;
+import com.ecommerce.account_service.exception.DuplicateResourceException;
+import com.ecommerce.account_service.exception.ResourceNotFoundException;
 import com.ecommerce.account_service.payload.AccountDTO;
 import com.ecommerce.account_service.payload.BasicAccountDTO;
 import com.ecommerce.account_service.service.AccountService;
@@ -21,6 +23,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO createAccount(AccountDTO accountDTO) {
+
+        if (accountRepository.existsByUserEmail(accountDTO.getUserEmail())) {
+            throw new DuplicateResourceException("Account with email " + accountDTO.getUserEmail() + " already exists.");
+        }
+        if (accountRepository.existsByUserName(accountDTO.getUserName())) {
+            throw new DuplicateResourceException("Account with username " + accountDTO.getUserName() + " already exists.");
+        }
+
         Account account = new Account();
         account.setUserEmail(accountDTO.getUserEmail());
         account.setUserName(accountDTO.getUserName());
@@ -61,6 +71,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deleteAccount(Long id) {
+        if (!accountRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Account with ID " + id + " not found.");
+        }
+
         accountRepository.deleteById(id);
     }
 

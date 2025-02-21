@@ -2,6 +2,8 @@ package com.ecommerce.account_service.service.impl;
 
 import com.ecommerce.account_service.dao.PaymentRepository;
 import com.ecommerce.account_service.entity.PaymentMethod;
+import com.ecommerce.account_service.exception.DuplicateResourceException;
+import com.ecommerce.account_service.exception.ResourceNotFoundException;
 import com.ecommerce.account_service.payload.PaymentMethodDTO;
 import com.ecommerce.account_service.service.PaymentService;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentMethodDTO createPaymentMethod(PaymentMethodDTO paymentMethodDTO) {
+
+        if (paymentRepository.existsByCardNumber(paymentMethodDTO.getCardNumber())) {
+            throw new DuplicateResourceException("Payment method with card number already exists.");
+        }
+
         PaymentMethod paymentMethod = new PaymentMethod(
                 null, // auto generated id
                 paymentMethodDTO.getCardNumber(),
@@ -60,6 +67,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void deletePaymentMethod(Long id) {
+        if (!paymentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Payment method with ID: " + id + " not found.");
+        }
+
         paymentRepository.deleteById(id);
     }
 
