@@ -24,8 +24,8 @@ public class AccountServiceImpl implements AccountService {
         Account account = new Account();
         account.setUserEmail(accountDTO.getUserEmail());
         account.setUserName(accountDTO.getUserName());
-        accountDTO.setBillingAddress(accountDTO.getBillingAddress());
-        accountDTO.setPaymentMethod(accountDTO.getPaymentMethod());
+        account.setBillingAddress(accountDTO.getBillingAddress());
+        account.setPaymentMethod(accountDTO.getPaymentMethod());
 
         Account savedAccount = accountRepository.save(account);
         return convertToAccountDTO(savedAccount);

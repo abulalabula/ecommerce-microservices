@@ -1,5 +1,6 @@
 package com.ecommerce.account_service.controller;
 
+import com.ecommerce.account_service.exception.ResourceNotFoundException;
 import com.ecommerce.account_service.payload.AddressDTO;
 import com.ecommerce.account_service.service.AddressService;
 import jakarta.validation.Valid;
@@ -31,13 +32,19 @@ public class AddressController {
     @GetMapping("/{id}")
     public ResponseEntity<AddressDTO> getAddressById(@PathVariable Long id) {
         AddressDTO address = addressService.getAddressById(id);
-        return address != null ? ResponseEntity.ok(address) : ResponseEntity.notFound().build();
+        if (address == null) {
+            throw new ResourceNotFoundException("Address with ID: " + id + " not found.");
+        }
+        return ResponseEntity.ok(address);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long id, @Valid @RequestBody AddressDTO addressDTO) {
         AddressDTO updatedAddress = addressService.updateAddress(id, addressDTO);
-        return updatedAddress != null ? ResponseEntity.ok(updatedAddress) : ResponseEntity.notFound().build();
+        if (updatedAddress == null) {
+            throw new ResourceNotFoundException("Address with ID: " + id + " not found.");
+        }
+        return ResponseEntity.ok(updatedAddress);
     }
 
     @DeleteMapping("/{id}")

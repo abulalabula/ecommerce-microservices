@@ -1,5 +1,6 @@
 package com.ecommerce.account_service.controller;
 
+import com.ecommerce.account_service.exception.ResourceNotFoundException;
 import com.ecommerce.account_service.payload.AccountDTO;
 import com.ecommerce.account_service.payload.BasicAccountDTO;
 import com.ecommerce.account_service.service.AccountService;
@@ -29,16 +30,21 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
-    @GetMapping("/{id}")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable Long id) {
         AccountDTO account = accountService.getAccountById(id);
-        return account != null ? ResponseEntity.ok(account) : ResponseEntity.notFound().build();
+        if (account == null) {
+            throw new ResourceNotFoundException("Account/User with ID: " + id + " not found.");
+        }
+        return ResponseEntity.ok(account);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDTO accountDTO) {
         AccountDTO updatedAccount = accountService.updateAccount(id, accountDTO);
-        return updatedAccount != null ? ResponseEntity.ok(updatedAccount) : ResponseEntity.notFound().build();
+        if (updatedAccount == null) {
+            throw new ResourceNotFoundException("Account/User with ID: " + id + " not found.");
+        }
+        return ResponseEntity.ok(updatedAccount);
     }
 
     @DeleteMapping("/{id}")
