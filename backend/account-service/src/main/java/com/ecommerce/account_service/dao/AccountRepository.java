@@ -13,6 +13,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     // login
     Optional<Account> findByUserName(String userName);
 
+    Optional<Account> findByUserNameOrUserEmail(String userName, String email);
+
     // email is already registered?
     Boolean existsByUserEmail(String email);
 
