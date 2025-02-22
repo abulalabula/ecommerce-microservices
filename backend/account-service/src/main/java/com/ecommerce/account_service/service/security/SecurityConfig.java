@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // Allow authentication endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // Only ADMIN can access
+                        .requestMatchers("/api/accounts/**").hasRole("ADMIN")
                         .anyRequest().authenticated()  // other endpoints
                 )
 //                .httpBasic(withDefaults()) -> basic auth
