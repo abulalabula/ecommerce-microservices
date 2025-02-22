@@ -1,0 +1,20 @@
+spring:
+#  config:
+#    activate:
+#      on-profile: local
+  server:
+    port: 8081
+
+# Database credentials
+  datasource:
+    url: jdbc:mysql://localhost:3306/account_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+#  for log from API response
+#  mvc:
+#    log-resolved-exception: true
