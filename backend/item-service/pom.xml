@@ -13,6 +13,7 @@
 	<description>Item Service for E-commerce with Microservices</description>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver-sync</artifactId>

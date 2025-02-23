@@ -25,24 +25,24 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BasicItemDTO>> getAllItems() {
+    public ResponseEntity<List<ItemDTO>> getAllItems() {
         return ResponseEntity.ok(itemService.getAllItems());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDTO> getItemById(@PathVariable Long id) {
+    public ResponseEntity<ItemDTO> getItemById(@PathVariable String id) {
         ItemDTO account = itemService.getItemById(id);
         return account != null ? ResponseEntity.ok(account) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @Valid @RequestBody ItemDTO itemDTO) {
-        ItemDTO updatedAccount = itemService.updateItem(id, itemDTO);
-        return updatedAccount != null ? ResponseEntity.ok(updatedAccount) : ResponseEntity.notFound().build();
+    public ResponseEntity<ItemDTO> updateItem(@PathVariable String id, @Valid @RequestBody ItemDTO itemDTO) {
+        ItemDTO updateItem = itemService.updateItem(id, itemDTO);
+        return updateItem != null ? ResponseEntity.ok(updateItem) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteItem(@PathVariable String id) {
         itemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
