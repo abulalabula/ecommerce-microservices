@@ -12,12 +12,12 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-//    @Value("${jwt.secret}")
-    @Value("ZhZmq9/RPz3kQ7XX6CQLZECQIUUgw1srQCFjO42PSawQsqL1rKpOqjXNk6K9GS3uyGm7swipuZ19Uww0xiFU8w==")
+    @Value("${jwt.secret}")
+//    @Value("ZhZmq9/RPz3kQ7XX6CQLZECQIUUgw1srQCFjO42PSawQsqL1rKpOqjXNk6K9GS3uyGm7swipuZ19Uww0xiFU8w==")
     private String jwtSecret;
 
-//    @Value("${jwt.expiration}")
-    @Value("86400000")
+    @Value("${jwt.expiration}")
+//    @Value("86400000")
     private int jwtExpirationMs;
 // token provider
     public String generateToken(Authentication authentication) {
