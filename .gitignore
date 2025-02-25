@@ -24,6 +24,7 @@ backend/**/logs/         # Ignore logs for all services
 backend/**/.mvn/         # Ignore Maven wrapper directories
 backend/**/HELP.md       # Ignore auto-generated Spring Boot HELP.md files
 
+backend/order-service/docker-data/**
 # Ignore specific services if needed (e.g., ignore build for order-service)
 # backend/order-service/target/
 # backend/payment-service/target/
