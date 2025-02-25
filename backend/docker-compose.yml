@@ -9,13 +9,15 @@ services:
     env_file:
       - ./account-service/.env
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: account_db
+      MYSQL_USER: ${DB_MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-
+      - ./account-service/init.sql:/docker-entrypoint-initdb.d/init.sql
   # Account Service
   account-service:
     build:
