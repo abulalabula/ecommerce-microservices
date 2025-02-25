@@ -1,9 +1,7 @@
 package com.ecommerce.item_service.controller;
 
-
 import com.ecommerce.item_service.payload.ItemDTO;
 import com.ecommerce.item_service.service.ItemService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +18,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemDTO> createItem(@Valid @RequestBody ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> createItem( @RequestBody ItemDTO itemDTO) {
         return ResponseEntity.ok(itemService.createItem(itemDTO));
     }
 
@@ -31,12 +29,12 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> getItemById(@PathVariable String id) {
-        ItemDTO account = itemService.getItemById(id);
-        return account != null ? ResponseEntity.ok(account) : ResponseEntity.notFound().build();
+        ItemDTO item = itemService.getItemById(id);
+        return item != null ? ResponseEntity.ok(item) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemDTO> updateItem(@PathVariable String id, @Valid @RequestBody ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> updateItem(@PathVariable String id,  @RequestBody ItemDTO itemDTO) {
         ItemDTO updateItem = itemService.updateItem(id, itemDTO);
         return updateItem != null ? ResponseEntity.ok(updateItem) : ResponseEntity.notFound().build();
     }

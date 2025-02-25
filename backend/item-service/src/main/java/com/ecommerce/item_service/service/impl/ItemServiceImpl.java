@@ -21,7 +21,9 @@ public class ItemServiceImpl implements ItemService {
     }
     @Override
     public ItemDTO createItem(ItemDTO itemDTO) {
-        return new ItemDTO(itemRepository.save(itemDTO.toItem()));
+
+        return new ItemDTO(itemRepository.save(itemDTO.toItem())
+        );
     }
 
     @Override
@@ -32,9 +34,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDTO getItemById(String id) {
         Item item = itemRepository.findOne(id);
-//        if (item == null) {
-//            throw EntityNotFoundException(id);
-//        }
         return new ItemDTO(item);
     }
 

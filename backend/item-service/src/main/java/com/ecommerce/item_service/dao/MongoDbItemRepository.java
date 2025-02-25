@@ -51,7 +51,7 @@ public class MongoDbItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item update(Item item) {
+    public Item update(String id, Item item) {
         if (item.getId() == null) {
             throw new IllegalArgumentException("Item ID cannot be null for update.");
         }
@@ -82,7 +82,7 @@ public class MongoDbItemRepository implements ItemRepository {
     }
 
     @Override
-    public long deleteOne(String id) {
+    public void deleteOne(String id) {
         DeleteResult result = itemCollection.deleteOne(Filters.eq("_id", new ObjectId(id)));
 //        return result.getDeletedCount();
     }
