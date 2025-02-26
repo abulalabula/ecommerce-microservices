@@ -1,0 +1,14 @@
+
+
+1. Idempotency: don’t want to double-charge or double-refund. How to associate refund and charge. MySQL or PostgreSQL   
+
+
+2. When give a new order,
+Order service(Kafka's consumer) KafkaConsumerConfig
+will call
+    (1) Item service(not async, call api to know how much) and call
+    (2) Payment service (not async) as Kafka's producer to
+	i. validate card (maybe cost $1 first if new card is used), then
+        ii. charge the remaining fee if card is valid
+
+Then,Payment service use Kafka to notify (async) Order service the order is succesful or not.
