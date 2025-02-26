@@ -4,6 +4,7 @@ import com.ecommerce.item_service.dao.ItemRepository;
 import com.ecommerce.item_service.entity.Item;
 import com.ecommerce.item_service.payload.ItemDTO;
 import com.ecommerce.item_service.service.ItemService;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,16 +34,29 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO getItemById(String id) {
-        Item item = itemRepository.findOne(id);
+        Item item = itemRepository.findById(id).orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
         return new ItemDTO(item);
     }
 
     @Override
+    public int getStockById(String id) {
+        Item item = itemRepository.findById(id).orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
+        return item.getStock();
+    }
+
+    @Override
     public ItemDTO updateItem(String id, ItemDTO itemDTO) {
-        System.out.println("In update item service impl");
-        System.out.println("Id: " + id);
-        System.out.println("ItemDTO: " + itemDTO);
         return new ItemDTO(itemRepository.update(id, itemDTO.toItem()));
+    }
+
+    @Override
+    public ItemDTO updateStock(String id, int quantity) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
+
+        item.setStock(quantity);
+        Item updatedItem = itemRepository.update(id, item);
+        return new ItemDTO(updatedItem);
     }
 
     @Override

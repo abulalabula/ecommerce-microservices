@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -49,22 +50,27 @@ public class MongoDbItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item findOne(String id) {
-        System.out.println("in find One + " + id);
+    public Optional<Item> findById(String id) {
 
-        return itemCollection.find(eq("_id", new ObjectId(id))).first();
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id); // Convert only if it's an ObjectId
+        } catch (IllegalArgumentException e) {
+            return Optional.empty(); // Invalid ObjectId format
+        }
+
+        Item item = itemCollection.find(eq("_id", objectId)).first();
+        return Optional.ofNullable(item);
     }
 
     @Override
     public Item update(String id, Item item) {
-        System.out.println("In update item repository");
 
         if (item.getId() == null) {
             throw new IllegalArgumentException("Item ID cannot be null for update.");
         }
 
         ObjectId objectId = new ObjectId(String.valueOf(id));
-        System.out.println("Item ID: " + objectId);
         var updateQuery = Updates.combine(
                 Updates.set("name", item.getName()),
                 Updates.set("upc", item.getUpc()),
@@ -73,9 +79,7 @@ public class MongoDbItemRepository implements ItemRepository {
                 Updates.set("stock", item.getStock()),
                 Updates.set("updatedAt", new Date())
         );
-        System.out.println("Update Query: " + updateQuery);
         var result = itemCollection.updateOne(Filters.eq("_id", objectId), updateQuery, new UpdateOptions().upsert(false));
-        System.out.println("Result: " + result);
         if (result.getModifiedCount() > 0) {
             return item;
         } else {
@@ -90,8 +94,7 @@ public class MongoDbItemRepository implements ItemRepository {
 
     @Override
     public void deleteOne(String id) {
-        DeleteResult result = itemCollection.deleteOne(Filters.eq("_id", new ObjectId(id)));
-//        return result.getDeletedCount();
+        itemCollection.deleteOne(Filters.eq("_id", new ObjectId(id)));
     }
 
 }
