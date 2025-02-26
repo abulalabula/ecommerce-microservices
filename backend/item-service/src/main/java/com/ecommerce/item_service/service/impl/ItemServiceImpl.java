@@ -6,7 +6,6 @@ import com.ecommerce.item_service.payload.ItemDTO;
 import com.ecommerce.item_service.service.ItemService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import com.ecommerce.item_service.exception.EntityNotFoundException;
 
 import java.util.List;
 
@@ -28,6 +27,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTO> getAllItems() {
+        System.out.println("In get all item service impl");
         return itemRepository.findAll().stream().map(ItemDTO::new).toList();
     }
 
@@ -39,6 +39,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO updateItem(String id, ItemDTO itemDTO) {
+        System.out.println("In update item service impl");
+        System.out.println("Id: " + id);
+        System.out.println("ItemDTO: " + itemDTO);
         return new ItemDTO(itemRepository.update(id, itemDTO.toItem()));
     }
 

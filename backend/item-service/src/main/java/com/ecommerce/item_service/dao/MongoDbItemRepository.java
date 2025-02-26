@@ -1,5 +1,5 @@
 package com.ecommerce.item_service.dao;
-
+import com.ecommerce.item_service.dao.ItemRepository;
 import com.ecommerce.item_service.entity.Item;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -10,6 +10,7 @@ import com.mongodb.client.result.DeleteResult;
 import jakarta.annotation.PostConstruct;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ public class MongoDbItemRepository implements ItemRepository {
 
     private final MongoClient client;
     private MongoCollection<Item> itemCollection;
+    @Value("${spring.data.mongodb.database}")  // Inject database name
+    private String databaseName;
 
     public MongoDbItemRepository(MongoClient mongoClient) {
         this.client = mongoClient;
@@ -30,7 +33,7 @@ public class MongoDbItemRepository implements ItemRepository {
 
     @PostConstruct
     void init() {
-        itemCollection = client.getDatabase("test").getCollection("items", Item.class);
+        itemCollection = client.getDatabase(databaseName).getCollection("items", Item.class);
     }
 
     @Override
@@ -47,17 +50,21 @@ public class MongoDbItemRepository implements ItemRepository {
 
     @Override
     public Item findOne(String id) {
+        System.out.println("in find One + " + id);
+
         return itemCollection.find(eq("_id", new ObjectId(id))).first();
     }
 
     @Override
     public Item update(String id, Item item) {
+        System.out.println("In update item repository");
+
         if (item.getId() == null) {
             throw new IllegalArgumentException("Item ID cannot be null for update.");
         }
 
-        ObjectId objectId = new ObjectId(String.valueOf(item.getId()));
-
+        ObjectId objectId = new ObjectId(String.valueOf(id));
+        System.out.println("Item ID: " + objectId);
         var updateQuery = Updates.combine(
                 Updates.set("name", item.getName()),
                 Updates.set("upc", item.getUpc()),
@@ -66,9 +73,9 @@ public class MongoDbItemRepository implements ItemRepository {
                 Updates.set("stock", item.getStock()),
                 Updates.set("updatedAt", new Date())
         );
-
+        System.out.println("Update Query: " + updateQuery);
         var result = itemCollection.updateOne(Filters.eq("_id", objectId), updateQuery, new UpdateOptions().upsert(false));
-
+        System.out.println("Result: " + result);
         if (result.getModifiedCount() > 0) {
             return item;
         } else {
