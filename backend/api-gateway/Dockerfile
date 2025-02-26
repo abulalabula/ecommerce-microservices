@@ -4,10 +4,10 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Cp JAR into container
-COPY target/item-service-*.jar item-service.jar
+COPY target/api-gateway-*.jar api-gateway.jar
 
 # port
 EXPOSE 8080
 
 # Run
-ENTRYPOINT ["java", "-jar", "item-service.jar"]
+ENTRYPOINT ["java", "-jar", "api-gateway.jar"]

@@ -28,7 +28,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTO> getAllItems() {
-        System.out.println("In get all item service impl");
         return itemRepository.findAll().stream().map(ItemDTO::new).toList();
     }
 

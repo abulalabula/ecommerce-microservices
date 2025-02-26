@@ -1,6 +1,32 @@
 version: "3.8"
 
 services:
+  # Service Registry (Eureka Server)
+  service-registry:
+    build:
+      context: ./service-registry
+      dockerfile: Dockerfile
+    container_name: service-registry-container
+    restart: always
+    ports:
+      - "8761:8761"
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway-container
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - service-registry
+      - account-service
+      - item-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka/
+
   # MySQL Database for `account-service`
   mysql:
     image: mysql:8
@@ -26,7 +52,7 @@ services:
     container_name: account-service-container
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - mysql
     env_file:
@@ -52,7 +78,7 @@ services:
     container_name: item-service-container
     restart: always
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       - mongo
     env_file:

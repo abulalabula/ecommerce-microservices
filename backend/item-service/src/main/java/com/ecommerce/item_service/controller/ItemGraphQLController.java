@@ -68,8 +68,7 @@ public class ItemGraphQLController {
     }
 
     @MutationMapping
-    public Boolean deleteItem(@Argument String id) {
+    public void deleteItem(@Argument String id) {
         itemService.deleteItem(id);
-        return true;
     }
 }
