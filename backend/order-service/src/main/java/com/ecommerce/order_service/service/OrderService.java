@@ -1,13 +1,15 @@
 package com.ecommerce.order_service.service;
 
-import com.ecommerce.order_service.payload.OrderDTO;
-
-import java.util.List;
+import com.ecommerce.order_service.entity.Order;
+import com.ecommerce.order_service.entity.PaymentEvent;
+import com.ecommerce.order_service.payload.OrderRequestDTO;
 
 public interface OrderService {
-    OrderDTO createOrder(OrderDTO orderDTO);
-    List<OrderDTO> getAllOrdersByCustomerId(String id);
-    OrderDTO getOrderById(String id);
-    long cancelOrderById(String id);
-    void updateOrder(String id, OrderDTO orderDTO);
+    Order createOrder(OrderRequestDTO orderRequestDTO);
+    Order cancelOrder(String userId, String orderId);
+    Order updateOrder(String orderId, OrderRequestDTO orderRequestDTO);
+    Order getOrderById(String userId, String orderId);
+
+    void processPaymentResponse(PaymentEvent response);
+
 }

@@ -1,6 +1,7 @@
 spring:
   kafka:
-    bootstrap-servers: localhost:9092   # Kafka broker addresses
+#    bootstrap-servers: localhost:9093   # Kafka broker addresses
+    bootstrap-servers: kafka:9092   # Kafka broker addresses
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer    # Serializer for the key
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer  # Serializer for the value (event)
