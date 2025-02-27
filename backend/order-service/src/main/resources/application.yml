@@ -16,4 +16,4 @@ spring:
 
 order:
   event:
-    topicName: order-events
+    topicName: order_events

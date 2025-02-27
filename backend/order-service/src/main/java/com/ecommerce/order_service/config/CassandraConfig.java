@@ -1,10 +1,14 @@
 package com.ecommerce.order_service.config;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import org.springframework.boot.autoconfigure.cassandra.CassandraProperties;
 import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
+import org.springframework.data.cassandra.config.CassandraSessionFactoryBean;
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
 
@@ -27,3 +31,4 @@ public class CassandraConfig {
         return builder -> builder.withKeyspace(properties.getKeyspaceName());
     }
 }
+

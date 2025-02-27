@@ -12,10 +12,10 @@ send_request() {
 }
 
 # Get All Items
-#GET_ALL_ITEMS='{
-#  "query": "query { getAllItems { id name upc price imageUrls stock } }"
-#}'
-#send_request "$GET_ALL_ITEMS"
+GET_ALL_ITEMS='{
+  "query": "query { getAllItems { id name upc price imageUrls stock } }"
+}'
+send_request "$GET_ALL_ITEMS"
 #
 ## Get Item by ID
 #GET_ITEM_BY_ID='{
