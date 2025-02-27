@@ -2,6 +2,7 @@ package com.ecommerce.payment_service.service.impl;
 
 import com.ecommerce.payment_service.dao.PaymentRepository;
 import com.ecommerce.payment_service.payload.PaymentRequestDto;
+import com.ecommerce.payment_service.payload.RefundRequestDto;
 import com.ecommerce.payment_service.entity.Payment;
 import com.ecommerce.payment_service.entity.PaymentStatus;
 import com.ecommerce.payment_service.event.PaymentEvent;
@@ -73,7 +74,39 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
         paymentEventProducer.publishEvent(event);
     }
+
+    @Override
+    @Transactional
+    public void processRefund(RefundRequestDto request) {
+        Optional<Payment> originalPayment = paymentRepository.findById(request.getOriginalPaymentId());
+        if (originalPayment.isEmpty()) {
+            LOGGER.warn("Refund failed: Original payment not found.");
+            return;
+        }
+
+        Payment payment = originalPayment.get();
+        if (!payment.getStatus().equals(PaymentStatus.COMPLETED)) {
+            LOGGER.warn("Refund failed: Payment is not completed.");
+            return;
+        }
+
+        // Create refund transaction
+        Payment refund = new Payment();
+        refund.setTransactionId(request.getTransactionId());
+        refund.setOrderId(payment.getOrderId());
+        refund.setUserId(payment.getUserId());
+        refund.setItemId(payment.getItemId());
+        refund.setAmount(request.getRefundAmount().negate()); // Negative amount to represent refund
+        refund.setCurrency(payment.getCurrency());
+        refund.setStatus(PaymentStatus.REFUNDED);
+        refund.setPaymentMethod(payment.getPaymentMethod());
+        refund.setCardLast4(payment.getCardLast4());
+
+        paymentRepository.save(refund);
+
+        // Publish refund event
+        PaymentEvent refundEvent = new PaymentEvent("payment_refunded", payment.getUserId(), payment.getItemId(),
+                payment.getOrderId().toString(), payment.getCardLast4(), Instant.now());
+        paymentEventProducer.publishEvent(refundEvent);
+    }
 }
-
-
-
