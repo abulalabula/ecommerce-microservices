@@ -2,7 +2,7 @@ package com.ecommerce.order_service.service.impl;
 
 import com.ecommerce.order_service.dao.OrderRepository;
 import com.ecommerce.order_service.entity.*;
-import com.ecommerce.order_service.kafka.OrderEventProducer;
+//import com.ecommerce.order_service.kafka.OrderEventProducer;
 import com.ecommerce.order_service.payload.OrderRequestDTO;
 
 import java.math.BigDecimal;
@@ -28,23 +28,24 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderRepository orderRepository;
     private RestTemplate restTemplate;
-    private OrderEventProducer orderEventProducer;
+//    private OrderEventProducer orderEventProducer;
     private PaymentServiceClient paymentServiceClient;
 
     private static final String PAYMENT_SERVICE_URL = "http://payment-service/api/payments/process";
     private static final String REFUND_SERVICE_URL = "http://payment-service/api/payments/refund";
 //    private static final String ITEM_SERVICE_URL = "http://item-service/api/items/graphql";
     private static final String ITEM_SERVICE_URL = "http://localhost:8081/api/items/graphql";
+
     public OrderServiceImpl(OrderRepository orderRepository,
                             RestTemplate restTemplate,
-                            OrderEventProducer orderEventProducer,
+//                            OrderEventProducer orderEventProducer,
                             PaymentServiceClient paymentServiceClient) {
         this.orderRepository = orderRepository;
         this.restTemplate = restTemplate;
-        this.orderEventProducer = orderEventProducer;
+//        this.orderEventProducer = orderEventProducer;
         this.paymentServiceClient = paymentServiceClient;
     }
-    // PENDING, COMPLETED, FAILED, REFUNDED
+
     @Override
     @Transactional
     public Order createOrder(OrderRequestDTO orderRequestDTO) {
@@ -68,11 +69,12 @@ public class OrderServiceImpl implements OrderService {
         System.out.println("order created");
         System.out.println(order);
 
-
-                // Synchronously validate with Item Service inventory
+        // TODO: initiatePayment was invoke twice, need to fix
+        // Synchronously validate with Item Service inventory
         CompletableFuture<Map.Entry<Boolean, BigDecimal>> validationFuture = validateAndCalculateTotal(orderRequestDTO);
         // When the future completes, process the result
         validationFuture.thenAccept(result -> {
+            System.out.println("In then accept");
             boolean allItemsValid = result.getKey();  // Extract validation result
             BigDecimal totalAmount = result.getValue(); // Extract total price
             System.out.println("all items valid " + allItemsValid);
@@ -184,6 +186,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void processPaymentResponse(PaymentEvent event){
+        System.out.println("In process payment response");
+        System.out.println(event);
         String orderId = event.getOrderId();
         String userId = event.getUserId().toString();
         Optional<Order> orderOpt = orderRepository.findLatestOrderByUserIdAndOrderId(userId, orderId);
@@ -299,7 +303,7 @@ public class OrderServiceImpl implements OrderService {
     }
     public CompletableFuture<Map> executeGraphQLQuery(String query) {
         WebClient webClient = WebClient.builder()
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://localhost:8082")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 

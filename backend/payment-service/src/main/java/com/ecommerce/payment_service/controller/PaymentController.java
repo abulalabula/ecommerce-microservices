@@ -1,5 +1,6 @@
 package com.ecommerce.payment_service.controller;
 
+import com.ecommerce.payment_service.entity.Payment;
 import com.ecommerce.payment_service.payload.PaymentRequestDto;
 import com.ecommerce.payment_service.payload.RefundRequestDto;
 import com.ecommerce.payment_service.service.PaymentService;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -22,6 +24,11 @@ public class PaymentController {
     public ResponseEntity<Void> processPayment(@RequestBody PaymentRequestDto request) {
         paymentService.processPayment(request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
     @PostMapping("/validate")

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,13 +32,21 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
+    @Override
     @Transactional
     public void processPayment(PaymentRequestDto request) {
+        System.out.println("in process payment");
         // Ensure idempotency (check if payment already exists)
         Optional<Payment> existingPayment = paymentRepository.findByTransactionId(request.getTransactionId());
         if (existingPayment.isPresent()) {
             LOGGER.warn("Duplicate payment request detected, ignoring.");
             return;
+        } else {
+            System.out.println("no duplicate payment");
         }
 
         // Determine charge amount (new card requires $1 pre-charge)
@@ -54,12 +63,13 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(PaymentStatus.PENDING);
         payment.setPaymentMethod(request.getPaymentMethod());
         payment.setCardLast4(request.getCardLast4());
-
-        paymentRepository.save(payment);
+        System.out.println("before saving payment");
+        System.out.println(payment.toString());
+//        paymentRepository.save(payment);
 
         // Simulate Payment Processing (80% success rate)
         boolean isSuccessful = Math.random() > 0.2;
-
+        System.out.println("isSuccessful: " + isSuccessful);
         PaymentEvent event;
         if (isSuccessful) {
             payment.setStatus(PaymentStatus.COMPLETED);
@@ -70,9 +80,11 @@ public class PaymentServiceImpl implements PaymentService {
             event = new PaymentEvent("payment_authorization_failed", request.getUserId(), request.getItemId(),
                     request.getOrderId().toString(), request.getCardLast4(), Instant.now());
         }
-
+        System.out.println("before publish payment");
+        System.out.println(event);
         paymentRepository.save(payment);
-        paymentEventProducer.publishEvent(event);
+        // Publish payment event works fine, but consumer by order service has deserializing error
+        // paymentEventProducer.publishEvent(event);
     }
 
     @Override
@@ -107,6 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
         // Publish refund event
         PaymentEvent refundEvent = new PaymentEvent("payment_refunded", payment.getUserId(), payment.getItemId(),
                 payment.getOrderId().toString(), payment.getCardLast4(), Instant.now());
+
         paymentEventProducer.publishEvent(refundEvent);
     }
 }

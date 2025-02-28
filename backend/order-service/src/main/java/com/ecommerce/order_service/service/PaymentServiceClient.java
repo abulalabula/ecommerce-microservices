@@ -4,10 +4,14 @@ import com.ecommerce.order_service.entity.Order;
 import com.ecommerce.order_service.entity.OrderPrimaryKey;
 import com.ecommerce.order_service.payload.PaymentRequestDto;
 import com.ecommerce.order_service.payload.RefundRequestDto;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -17,8 +21,9 @@ public class PaymentServiceClient {
     private final WebClient webClient;
 
     public PaymentServiceClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://payment-service").build();
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8084").build();
     }
+
 
     public void initiatePayment(Order order, BigDecimal totalAmount) {
         OrderPrimaryKey key = order.getKey();
@@ -38,6 +43,9 @@ public class PaymentServiceClient {
                 .bodyValue(requestDTO)
                 .retrieve()
                 .bodyToMono(Void.class) // No response expected
+                .doOnSuccess(v -> System.out.println("Payment request sent successfully"))
+                .doOnError(error -> System.err.println("Payment request failed: " + error.getMessage()))
+
                 .subscribe(); // Fire-and-forget (non-blocking)
     }
 

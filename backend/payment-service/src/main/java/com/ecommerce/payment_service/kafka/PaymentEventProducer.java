@@ -19,6 +19,7 @@ public class PaymentEventProducer {
     private static final String PAYMENT_TOPIC = "payment-events";
 
     public void publishEvent(PaymentEvent event) {
+        System.out.println("in payment event producer");
         LOGGER.info("Publishing Payment Event: {}", event);
         kafkaTemplate.send(PAYMENT_TOPIC, event);
     }
