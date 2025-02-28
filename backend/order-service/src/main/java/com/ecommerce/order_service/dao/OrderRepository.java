@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderRepository extends CassandraRepository<Order, UUID> {
-    @Query("SELECT * FROM orders WHERE user_id = ?0 AND order_id = ?1 ORDER BY created_at DESC LIMIT 1")
+    @Query("SELECT * FROM orders WHERE user_id = ?0 AND order_id = ?1 LIMIT 1")
     Optional<Order> findLatestOrderByUserIdAndOrderId(String userId, String orderId);
 
 

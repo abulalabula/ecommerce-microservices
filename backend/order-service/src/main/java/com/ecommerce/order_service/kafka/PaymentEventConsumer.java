@@ -27,8 +27,8 @@ public class PaymentEventConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "payment-events", groupId = "order-group",
-            containerFactory = "paymentResponseKafkaListenerContainerFactory")
+    @KafkaListener(topics = "${topic.name.consumer}", groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "paymentEventKafkaListenerContainerFactory")
     public void processPaymentResponse(ConsumerRecord<String, String> record) {
         if (record.value() == null || record.value().isEmpty()) {
             LOGGER.error("Error: Received empty or null payment response. Ignoring...");

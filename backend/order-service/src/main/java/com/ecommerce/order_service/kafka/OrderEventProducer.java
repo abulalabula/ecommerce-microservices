@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class OrderEventProducer {
     private final KafkaTemplate<String, OrderEvent> kafkaTemplate;
 
-    @Value("${order.event.topicName}")
+    @Value("${topic.name.producer}")
     private String topicName;
 
     OrderEventProducer(KafkaTemplate<String, OrderEvent> kafkaTemplate) {

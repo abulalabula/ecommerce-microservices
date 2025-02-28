@@ -1,0 +1,18 @@
+{
+  "userId": "12345",
+  "items": [
+    {
+      "itemId": "67bebc8abb9fc25ddf6af926",
+      "name": "Laptop",
+      "upc": "123456789012",
+      "quantity": 1
+    },
+    {
+      "itemId": "item-002",
+      "name": "Wireless Mouse",
+      "upc": "987654321098",
+      "quantity": 2
+    }
+  ],
+  "details": "Please deliver between 9 AM - 12 PM."
+}

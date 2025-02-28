@@ -18,11 +18,13 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
+        System.out.println("in create order controller");
+        System.out.println(orderRequestDTO);
         Order order = orderService.createOrder(orderRequestDTO);
         return order != null ? ResponseEntity.ok(order) : ResponseEntity.internalServerError().build();
     }
 
-    @PutMapping("cancel/{userId}/{orderId}")
+    @PostMapping("cancel/{userId}/{orderId}")
     public ResponseEntity<Order> cancelOrder(@PathVariable String userId, @PathVariable String orderId) {
         Order canceledOrder = orderService.cancelOrder(userId, orderId);
         return canceledOrder != null ? ResponseEntity.ok(canceledOrder) : ResponseEntity.notFound().build();

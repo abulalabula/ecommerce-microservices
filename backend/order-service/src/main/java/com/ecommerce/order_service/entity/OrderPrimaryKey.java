@@ -18,9 +18,9 @@ public class OrderPrimaryKey {
     @PrimaryKeyColumn(name = "user_id", type = PrimaryKeyType.PARTITIONED)
     private String userId;
 
+    @PrimaryKeyColumn(name = "order_id", type = PrimaryKeyType.PARTITIONED)
+    private String orderId;
+
     @PrimaryKeyColumn(name = "created_at", type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
     private LocalDateTime createdAt;
-
-    @PrimaryKeyColumn(name = "order_id", type = PrimaryKeyType.CLUSTERED, ordering = Ordering.ASCENDING)
-    private String orderId;
 }
