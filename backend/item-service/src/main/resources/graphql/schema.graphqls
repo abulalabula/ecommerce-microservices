@@ -1,0 +1,47 @@
+type Item {
+    id: ID!
+    name: String!
+    upc: String!
+    price: Float!
+    imageUrls: [String!]!
+    stock: Int!
+    createdAt: String!
+    updatedAt: String!
+}
+
+input ItemInput {
+    name: String!
+    upc: String!
+    price: Float!
+    imageUrls: [String!]!
+    stock: Int!
+}
+
+type Query {
+    getItem(id: ID!): Item
+    getAllItems: [Item!]!
+    getAvailableStock(id: ID!): Int!
+}
+
+type Mutation {
+    createItem(
+        name: String!
+        upc: String!
+        price: Float!
+        imageUrls: [String!]!
+        stock: Int!
+    ): Item!
+
+    updateItem(
+        id: ID!
+        name: String!
+        upc: String!
+        price: Float!
+        imageUrls: [String!]!
+        stock: Int!
+    ): Item!
+
+    deleteItem(id: ID!): Boolean!
+
+    updateStock(id: ID!, quantity: Int!): Item!
+}

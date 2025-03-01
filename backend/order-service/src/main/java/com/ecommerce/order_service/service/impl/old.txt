@@ -1,0 +1,134 @@
+package com.ecommerce.order_service.service.impl;
+
+import com.ecommerce.order_service.dao.OrderRepository;
+import com.ecommerce.order_service.entity.Order;
+import com.ecommerce.order_service.publisher.OrderEventKafkaPublisher;
+import com.ecommerce.order_service.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+@Service
+public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderEventKafkaPublisher publisher;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Override
+    public OrderDTO createOrder(OrderDTO orderDTO) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        OrderPrimaryKey primaryKey = new OrderPrimaryKey();
+        primaryKey.setUserId(orderDTO.getUserId());
+        primaryKey.setItemId(orderDTO.getItemId());
+        primaryKey.setCreatedAt(LocalDateTime.now());
+        order.setPrimaryKey(primaryKey);
+        order.setQuantity(orderDTO.getQuantity());
+        order.setStatus("CREATED");
+        saveAndPublishOrderEvent(order);
+
+        // Call payment service to initiate payment using RestTemplate (synchronous)
+//        String paymentUrl = "http://payment-service/api/payments";
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        PaymentRequestDTO paymentRequestDTO = new PaymentRequestDTO();
+//        paymentRequestDTO.setOrderId(order.getId().toString());
+//        paymentRequestDTO.setUserId(orderDTO.getUserId());
+//        paymentRequestDTO.setAmount(orderDTO.getAmount());
+//        paymentRequestDTO.setPaymentMethod("CREDIT_CARD"); // Or from orderDTO if available
+//
+//        HttpEntity<PaymentRequestDTO> requestEntity = new HttpEntity<>(paymentRequestDTO, headers);
+//        ResponseEntity<PaymentResponseDTO> responseEntity = restTemplate.postForEntity(
+//                paymentUrl, requestEntity, PaymentResponseDTO.class);
+//
+//        PaymentResponseDTO paymentResponse = responseEntity.getBody();
+        // update the order with payment ID if needed
+        // order.setPaymentId(paymentResponse.getPaymentId());
+        // orderRepository.save(order);
+
+        return converToOrderDTO(order);
+    }
+
+//    @KafkaListener(topics = "payment_events", groupId = "order_service")
+//    public void consumePaymentEvent(PaymentEvent paymentEvent) {
+//        if (paymentEvent.getStatus().equals("COMPLETED")) {
+//            OrderPrimaryKey primaryKey = new OrderPrimaryKey();
+//            primaryKey.setUserId(UUID.fromString(paymentEvent.getUserId()));
+//            // You would need to get itemId from somewhere or store it differently
+//            // Either query for the order using orderId or adjust your data model
+//
+//            Order order = orderRepository.findById(UUID.fromString(paymentEvent.getOrderId())).orElse(null);
+//            if (order != null) {
+//                order.setStatus("CONFIRMED");
+//                saveAndPublishOrderEvent(order);
+//            } else {
+//                log.error("Order not found for payment event: {}", paymentEvent.getOrderId());
+//            }
+//        } else if (paymentEvent.getStatus().equals("FAILED")) {
+//            cancelOrderById(paymentEvent.getOrderId());
+//        } else {
+//            log.info("Received payment event with status: {}", paymentEvent.getStatus());
+//            // Handle other statuses as needed
+//        }
+//    }
+
+    @Override
+    public long cancelOrderById(String id) {
+        Order order = orderRepository.findById(UUID.fromString(id)).orElse(null);
+        if (order == null) {
+            return -1;
+        }
+        order.setStatus("CANCELLED");
+        saveAndPublishOrderEvent(order);
+        return 0;
+    }
+
+    @Override
+    public void updateOrder(String id, OrderDTO orderDTO) {
+        orderRepository.findById(UUID.fromString(id)).ifPresent(order -> {
+            order.setStatus(orderDTO.getStatus());
+            saveAndPublishOrderEvent(order);
+        });
+    }
+
+    public void saveAndPublishOrderEvent(Order order) {
+        orderRepository.save(order);
+        publisher.sendOrderEvent(order);
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrdersByCustomerId(String id) {
+        List<OrderDTO> orders = new ArrayList<>();
+        //        List<OrderDTO> orders = orderRepository.findByUserId(id)
+//                .stream()
+//                .map(this::converToOrderDTO)
+//                .toList();
+        return orders;
+    }
+
+    @Override
+    public OrderDTO getOrderById(String id) {
+        Optional<Order> order = orderRepository.findById(UUID.fromString(id));
+        return order.map(this::converToOrderDTO).orElse(null);
+    }
+
+    public OrderDTO converToOrderDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        OrderPrimaryKey primaryKey = order.getPrimaryKey();
+        orderDTO.setUserId(primaryKey.getUserId());
+        orderDTO.setItemId(primaryKey.getItemId());
+        orderDTO.setQuantity(order.getQuantity());
+        orderDTO.setStatus(order.getStatus());
+        return orderDTO;
+    }
+}

@@ -1,12 +1,10 @@
 package com.ecommerce.order_service.controller;
 
-
-import com.ecommerce.order_service.payload.OrderDTO;
+import com.ecommerce.order_service.entity.Order;
+import com.ecommerce.order_service.payload.OrderRequestDTO;
 import com.ecommerce.order_service.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -19,36 +17,29 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
-        return ResponseEntity.ok(orderService.createOrder(orderDTO));
+    public ResponseEntity<Order> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
+        System.out.println("in create order controller");
+        System.out.println(orderRequestDTO);
+        Order order = orderService.createOrder(orderRequestDTO);
+        return order != null ? ResponseEntity.ok(order) : ResponseEntity.internalServerError().build();
     }
 
-//    @PostMapping
-//    public ResponseEntity<OrderDTO> confirmOrder(@RequestBody OrderDTO orderDTO) {
-//        return ResponseEntity.ok(orderService.confirmOrder(orderDTO));
-//    }
-
-
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<List<OrderDTO>> getAllOrdersByCustomerId(@PathVariable String id) {
-        return ResponseEntity.ok(orderService.getAllOrdersByCustomerId(id));
+    @PostMapping("cancel/{userId}/{orderId}")
+    public ResponseEntity<Order> cancelOrder(@PathVariable String userId, @PathVariable String orderId) {
+        Order canceledOrder = orderService.cancelOrder(userId, orderId);
+        return canceledOrder != null ? ResponseEntity.ok(canceledOrder) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderDTO> getOrderById(@PathVariable String id) {
-        OrderDTO order = orderService.getOrderById(id);
+    @PutMapping("/{orderId}")
+    public ResponseEntity<Order> updateOrder(@PathVariable String orderId,  @RequestBody OrderRequestDTO orderRequestDTO) {
+        Order updatedOrder = orderService.updateOrder(orderId, orderRequestDTO);
+        return updatedOrder != null ? ResponseEntity.ok(updatedOrder) : ResponseEntity.notFound().build();
+    }
+
+
+    @GetMapping("/{userId}/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable String userId, @PathVariable String orderId) {
+        Order order = orderService.getOrderById(userId, orderId);
         return order != null ? ResponseEntity.ok(order) : ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateOrder(@PathVariable String id,  @RequestBody OrderDTO orderDTO) {
-        orderService.updateOrder(id, orderDTO);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> cancelOrder(@PathVariable String id) {
-        orderService.cancelOrderById(id);
-        return ResponseEntity.noContent().build();
     }
 }

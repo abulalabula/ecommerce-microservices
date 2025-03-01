@@ -1,0 +1,82 @@
+# Test Queries
+
+# 1. Get All Items
+query {
+  getAllItems {
+    id
+    name
+    upc
+    price
+    imageUrls
+    stock
+  }
+}
+
+# 2. Get Item by ID
+query {
+  getItem(id: "65aef123456789abcd123456") {
+    id
+    name
+    upc
+    price
+    imageUrls
+    stock
+  }
+}
+
+# 3. Get Available Stock
+query {
+  getAvailableStock(id: "65aef123456789abcd123456")
+}
+
+# Test Mutations
+
+# 4. Create a New Item
+mutation {
+  createItem(
+    name: "Gaming Mouse",
+    upc: "123456789012",
+    price: 49.99,
+    imageUrls: ["https://example.com/mouse1.jpg", "https://example.com/mouse2.jpg"],
+    stock: 100
+  ) {
+    id
+    name
+    upc
+    price
+    imageUrls
+    stock
+  }
+}
+
+
+# 5. Update an Item
+mutation {
+  updateItem(id: "65aef123456789abcd123456",
+    name: "Wireless Gaming Mouse"
+    upc: "123456789012"
+    price: 59.99
+    imageUrls: ["https://example.com/mouse1.jpg", "https://example.com/mouse2.jpg"]
+    stock: 90
+  ) {
+    id
+    name
+    upc
+    price
+    imageUrls
+    stock
+  }
+}
+
+# 6. Delete an Item
+mutation {
+  deleteItem(id: "65aef123456789abcd123456")
+}
+
+# 7. Update Stock
+mutation {
+  updateStock(id: "65aef123456789abcd123456", quantity: 10) {
+    id
+    stock
+  }
+}

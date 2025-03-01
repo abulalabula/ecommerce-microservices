@@ -1,6 +1,5 @@
 package com.ecommerce.item_service.payload;
 
-
 import com.ecommerce.item_service.entity.Item;
 import org.bson.types.ObjectId;
 
@@ -15,6 +14,8 @@ public record ItemDTO(String id, String name, String upc, double price, List<Str
     }
 
     public Item toItem() {
-        return new Item(new ObjectId(id), name, upc, price, imageUrls, stock, createdAt, updatedAt);
+        ObjectId objectId = (id == null || id.isEmpty()) ? new ObjectId() : new ObjectId(id);
+        return new Item(objectId, name, upc, price, imageUrls, stock, createdAt, updatedAt);
     }
+
 }
