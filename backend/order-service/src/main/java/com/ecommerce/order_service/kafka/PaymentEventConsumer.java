@@ -27,23 +27,43 @@ public class PaymentEventConsumer {
         this.objectMapper = objectMapper;
     }
 
+//    @KafkaListener(topics = "${topic.name.consumer}", groupId = "${spring.kafka.consumer.group-id}",
+//            containerFactory = "paymentEventKafkaListenerContainerFactory")
+//    public void processPaymentResponse(ConsumerRecord<String, String> record) {
+//        System.out.println("in payment event consumer");
+//        System.out.println(record.value());
+//        if (record.value() == null || record.value().isEmpty()) {
+//            LOGGER.error("Error: Received empty or null payment response. Ignoring...");
+//            return;
+//        }
+//
+//        try {
+//            PaymentEvent event = objectMapper.readValue(record.value(), PaymentEvent.class);
+//            LOGGER.info("Received payment response: {}", event);
+//            orderService.processPaymentResponse(event);
+//            LOGGER.info("Payment processed successfully for Order ID: {}", event.getOrderId());
+//        } catch (Exception e) {
+//            LOGGER.error("Error deserializing or processing payment request: {} - {}", record.value(), e.getMessage(), e);
+//        }
+//    }
+
     @KafkaListener(topics = "${topic.name.consumer}", groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "paymentEventKafkaListenerContainerFactory")
-    public void processPaymentResponse(ConsumerRecord<String, String> record) {
+    public void processPaymentResponse(PaymentEvent event) {
         System.out.println("in payment event consumer");
-        System.out.println(record.value());
-        if (record.value() == null || record.value().isEmpty()) {
-            LOGGER.error("Error: Received empty or null payment response. Ignoring...");
+        System.out.println(event);
+
+        if (event == null) {
+            LOGGER.error("Error: Received null payment response. Ignoring...");
             return;
         }
 
         try {
-            PaymentEvent event = objectMapper.readValue(record.value(), PaymentEvent.class);
             LOGGER.info("Received payment response: {}", event);
             orderService.processPaymentResponse(event);
             LOGGER.info("Payment processed successfully for Order ID: {}", event.getOrderId());
         } catch (Exception e) {
-            LOGGER.error("Error deserializing or processing payment request: {} - {}", record.value(), e.getMessage(), e);
+            LOGGER.error("Error processing payment request: {}", e.getMessage(), e);
         }
     }
 }

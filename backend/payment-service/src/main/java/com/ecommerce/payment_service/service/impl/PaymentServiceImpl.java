@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -26,7 +27,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentEventProducer paymentEventProducer;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentEventProducer paymentEventProducer) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository
+                              , PaymentEventProducer paymentEventProducer
+    ) {
         this.paymentRepository = paymentRepository;
         this.paymentEventProducer = paymentEventProducer;
     }
@@ -39,7 +42,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void processPayment(PaymentRequestDto request) {
-        System.out.println("in process payment");
         // Ensure idempotency (check if payment already exists)
         Optional<Payment> existingPayment = paymentRepository.findByTransactionId(request.getTransactionId());
         if (existingPayment.isPresent()) {
@@ -63,13 +65,9 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(PaymentStatus.PENDING);
         payment.setPaymentMethod(request.getPaymentMethod());
         payment.setCardLast4(request.getCardLast4());
-        System.out.println("before saving payment");
-        System.out.println(payment.toString());
-//        paymentRepository.save(payment);
 
         // Simulate Payment Processing (80% success rate)
         boolean isSuccessful = Math.random() > 0.2;
-        System.out.println("isSuccessful: " + isSuccessful);
         PaymentEvent event;
         if (isSuccessful) {
             payment.setStatus(PaymentStatus.COMPLETED);
@@ -80,16 +78,15 @@ public class PaymentServiceImpl implements PaymentService {
             event = new PaymentEvent("payment_authorization_failed", request.getUserId(), request.getItemId(),
                     request.getOrderId().toString(), request.getCardLast4(), Instant.now());
         }
-        System.out.println("before publish payment");
-        System.out.println(event);
         paymentRepository.save(payment);
         // Publish payment event works fine, but consumer by order service has deserializing error
-        // paymentEventProducer.publishEvent(event);
+//         paymentEventProducer.publishEvent(event);
     }
 
     @Override
     @Transactional
     public void processRefund(RefundRequestDto request) {
+        System.out.println("in processRefund");
         Optional<Payment> originalPayment = paymentRepository.findById(request.getOriginalPaymentId());
         if (originalPayment.isEmpty()) {
             LOGGER.warn("Refund failed: Original payment not found.");
@@ -120,6 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentEvent refundEvent = new PaymentEvent("payment_refunded", payment.getUserId(), payment.getItemId(),
                 payment.getOrderId().toString(), payment.getCardLast4(), Instant.now());
 
-        paymentEventProducer.publishEvent(refundEvent);
+//        paymentEventProducer.publishEvent(refundEvent);
     }
 }
+
